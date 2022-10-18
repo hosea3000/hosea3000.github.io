@@ -4,7 +4,7 @@ baseURL = "https://hosea3000.github.io/note/"
 theme = "LoveIt"
 
 # 网站标题
-title = "我的全新 Hugo 网站"
+title = "Hosea 的个人笔记"
 
 # 网站语言, 仅在这里 CN 大写 ["en", "zh-CN", "fr", "pl", ...]
 languageCode = "zh-CN"
@@ -32,9 +32,9 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
 
 # 作者配置
 [author]
-name = "xxxx"
+name = "Hosea"
 email = ""
-link = ""
+link = "https://hosea3000.github.io/note/"
 
 # 菜单配置
 [menu]
@@ -77,9 +77,9 @@ fingerprint = ""
 # LoveIt 新增 | 0.2.0 日期格式
 dateFormat = "2006-01-02"
 # 网站标题, 用于 Open Graph 和 Twitter Cards
-title = "我的网站"
+title = "hosea的学习笔记"
 # 网站描述, 用于 RSS, SEO, Open Graph 和 Twitter Cards
-description = "这是我的全新 Hugo 网站"
+description = "hosea的学习笔记"
 # 网站图片, 用于 Open Graph 和 Twitter Cards
 images = ["/logo.png"]
 
@@ -141,7 +141,7 @@ rss = 10
 # LoveIt 新增 | 0.2.0 应用图标配置
 [params.app]
 # 当添加到 iOS 主屏幕或者 Android 启动器时的标题, 覆盖默认标题
-title = "我的网站"
+title = "hosea的个人笔记"
 # 是否隐藏网站图标资源链接
 noFavicon = false
 # 更现代的 SVG 网站图标, 可替代旧的 .png 和 .ico 文件
@@ -189,7 +189,7 @@ avatarURL = "/images/avatar.png"
 # LoveIt 更改 | 0.2.7 主页显示的网站标题 (支持 HTML 格式)
 title = ""
 # 主页显示的网站副标题 (允许 HTML 格式)
-subtitle = "这是我的全新 Hugo 网站"
+subtitle = "hosea的学习笔记"
 # 是否为副标题显示打字机动画
 typeit = true
 # 是否显示社交账号
