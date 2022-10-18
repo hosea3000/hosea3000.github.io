@@ -1,7 +1,5 @@
-# First_post
+# 新装 Ubuntu 服务器
 
-
-## 新装 Ubuntu 服务器
 
 ### 安装 oh-my-zsh
 
