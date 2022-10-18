@@ -1,7 +1,9 @@
 ---
-title: "枚举"
+title: "golang中的枚举类型"
 date: 2022-10-18T22:47:41+08:00
 draft: false
+
+categories: ["golang"]
 ---
 
 ⚠️ golang 没有枚举类型

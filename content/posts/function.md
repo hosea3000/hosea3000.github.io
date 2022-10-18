@@ -2,6 +2,8 @@
 title: "函数式选项模式"
 date: 2022-10-18T19:12:11+08:00
 draft: false
+
+categories: ["golang"]
 ---
 
 配置参数可变， 如何设计让未来增加方便， 好维护

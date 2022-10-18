@@ -201,7 +201,7 @@ title = ""
     # Gravatar 邮箱，用于优先在主页显示的头像
     gravatarEmail = ""
     # 主页显示头像的 URL
-    avatarURL = "images/actor.jpg"
+    avatarURL = "https://hosea3000.github.io/note/images/actor.jpg"
     # LoveIt 更改 | 0.2.7 主页显示的网站标题 (支持 HTML 格式)
     title = ""
     # 主页显示的网站副标题 (允许 HTML 格式)
@@ -306,7 +306,7 @@ title = ""
     # LoveIt 新增 | 0.2.0 是否在搜索结果中隐藏一篇文章
     hiddenFromSearch = false
     # LoveIt 新增 | 0.2.0 是否使用 twemoji
-    twemoji = false
+    twemoji = true
     # 是否使用 lightgallery
     lightgallery = false
     # LoveIt 新增 | 0.2.0 是否使用 ruby 扩展语法
