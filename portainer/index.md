@@ -24,7 +24,7 @@ docker run -d -p 9000:9000 --restart=always -v /var/run/docker.sock:/var/run/doc
 
 说白了就是一个主动一个被动
 
-#### 安装 agent
+#### Portainer Agent
 
 ```shell
 docker run -d -p 9001:9001 --name portainer_agent --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes portainer/agent:2.12.1
