@@ -28,5 +28,6 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         if: github.ref == 'refs/heads/main'
         with:
+          external_repository: <hosea3000>/<hosea3000>.github.io  # 替换成上文所创建的个人主页仓库
           github_token: ${{ secrets.HUGO_GITHUB_TOKEN }}
           publish_dir: ./public

@@ -15,7 +15,7 @@ featuredImagePreview: /images/goreleaser.png
 
 ### 最后的效果如下：
 
-![image-20221018105905803](/note/images/goreleaser.png)
+![image-20221018105905803](/images/goreleaser.png)
 
 
 ### 在你的项目下新建 `.goreleaser.yaml` 文件
