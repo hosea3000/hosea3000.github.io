@@ -3,7 +3,7 @@ title: "新装 Ubuntu 服务器"
 date: 2022-10-18T19:12:11+08:00
 draft: false
 tags: ["aa"]
-category: "bbb"
+categories: ["aaa", "bbbb"]
 ---
 
 ### 安装 oh-my-zsh
