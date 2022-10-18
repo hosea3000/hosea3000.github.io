@@ -1,0 +1,93 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>枚举 - Hosea 的个人笔记</title><meta name=Description content="hosea的学习笔记"><meta property="og:title" content="枚举"><meta property="og:description" content="⚠️ golang 没有枚举类型 但是我们可以通过类型别名实现一个简单版本的 enmu 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 package main import &#34;fmt&#34; type LogLevel int const ( INFO LogLevel = iota WARNING ERROR"><meta property="og:type" content="article"><meta property="og:url" content="https://hosea3000.github.io/note/golang/enum/"><meta property="og:image" content="https://hosea3000.github.io/logo.png"><meta property="article:section" content="golang"><meta property="article:published_time" content="2022-10-18T22:47:41+08:00"><meta property="article:modified_time" content="2022-10-18T22:55:26+08:00"><meta property="og:site_name" content="hosea的学习笔记"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://hosea3000.github.io/logo.png"><meta name=twitter:title content="枚举"><meta name=twitter:description content="⚠️ golang 没有枚举类型 但是我们可以通过类型别名实现一个简单版本的 enmu 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 package main import &#34;fmt&#34; type LogLevel int const ( INFO LogLevel = iota WARNING ERROR"><meta name=application-name content="hosea的个人笔记"><meta name=apple-mobile-web-app-title content="hosea的个人笔记"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hosea3000.github.io/note/golang/enum/><link rel=stylesheet href=/note/css/style.min.css><link rel=preload href=/note/lib/fontawesome-free/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/note/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/note/lib/animate/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/note/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"枚举","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hosea3000.github.io\/note\/golang\/enum\/"},"genre":"golang","wordcount":393,"url":"https:\/\/hosea3000.github.io\/note\/golang\/enum\/","datePublished":"2022-10-18T22:47:41+08:00","dateModified":"2022-10-18T22:55:26+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"Hosea"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/note/ title="Hosea 的个人笔记"></a></div><div class=menu><div class=menu-inner><a class=menu-item href=/note/>主页 </a><a class=menu-item href=/note/posts/>文章 </a><a class=menu-item href=/note/tags/>标签 </a><a class=menu-item href=/note/categories/>分类 </a><a class=menu-item href=/note/golang/>Golang </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder="Search titles or contents..." id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span>
+</span><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme"><i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/note/ title="Hosea 的个人笔记"></a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder="Search titles or contents..." id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/note/ title>主页</a><a class=menu-item href=/note/posts/ title>文章</a><a class=menu-item href=/note/tags/ title>标签</a><a class=menu-item href=/note/categories/ title>分类</a><a class=menu-item href=/note/golang/ title>Golang</a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class="page single special"><h1 class="single-title animate__animated animate__pulse animate__faster">枚举</h1><div class=content id=content><p>⚠️ golang 没有枚举类型</p><p>但是我们可以通过类型别名实现一个简单版本的 enmu</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=s>&#34;fmt&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>LogLevel</span> <span class=kt>int</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>const</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=nx>INFO</span> <span class=nx>LogLevel</span> <span class=p>=</span> <span class=kc>iota</span>
+</span></span><span class=line><span class=cl>    <span class=nx>WARNING</span>
+</span></span><span class=line><span class=cl>    <span class=nx>ERROR</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>l</span> <span class=nx>LogLevel</span><span class=p>)</span> <span class=nf>String</span><span class=p>()</span> <span class=kt>string</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>s</span> <span class=o>:=</span> <span class=p>[]</span><span class=kt>string</span><span class=p>{</span><span class=s>&#34;INFO&#34;</span><span class=p>,</span> <span class=s>&#34;WARNING&#34;</span><span class=p>,</span> <span class=s>&#34;ERROR&#34;</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>s</span><span class=p>[</span><span class=nx>l</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>test</span><span class=p>(</span><span class=nx>level</span> <span class=nx>LogLevel</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>level</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nf>test</span><span class=p>(</span><span class=nx>ERROR</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>我们可以为类型别名实现 <code>String()</code> 打印的时候 golang 会默认调用，所以打印出来是我们要的字符串值。</p><p>这里只是使用了类型别名。但是实际上还是 int 类型， 方法调用者还是能传其它的 int 值进来。 暂时没有好的解决办法</p><p>不过已经很好了，从方法的签名反应出类型的枚举值</p><h3 id=使用-gogenerate-自动生成-string-方法>使用 go:generate 自动生成 string 方法</h3><p>如果每次都要自己写类型的string实现很容易出错，也很麻烦。 官方提供了 stringer 专门用来做这个事情</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=s>&#34;fmt&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Pill</span> <span class=kt>int</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>const</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>   <span class=nx>Placebo</span> <span class=nx>Pill</span> <span class=p>=</span> <span class=kc>iota</span>
+</span></span><span class=line><span class=cl>   <span class=nx>Aspirin</span>
+</span></span><span class=line><span class=cl>   <span class=nx>Ibuprofen</span>
+</span></span><span class=line><span class=cl>   <span class=nx>Paracetamol</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>//go:generate stringer -type=Pill
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>   <span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;Hello, world.&#34;</span><span class=p>,</span> <span class=nx>Aspirin</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>执行命令 <code>go generate</code>会自动为你生成 pill_string.go 实现 string() 方法</p><h3 id=为什么-go-没有-enum-类型>为什么 go 没有 enum 类型？</h3><p>golang 的数据类型都有零值。 假如我们写了一个枚举类型的值是 [1，2，3，4，5] 那么他的零值是多少呢？</p></div></div></div></main><footer class=footer><div class=footer-container><div class=footer-line>Powered by <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.104.3">Hugo</a> | Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden=true></i> LoveIt</a></div><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2019 - 2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://hosea3000.github.io/note/ target=_blank>Hosea</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
+</a><a href=# id=view-comments class=fixed-button title="View Comments"><i class="fas fa-comment fa-fw" aria-hidden=true></i></a></div><link rel=stylesheet href=/note/lib/katex/katex.min.css><link rel=stylesheet href=/note/lib/cookieconsent/cookieconsent.min.css><script type=text/javascript src=/note/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/note/lib/lunr/lunr.min.js></script><script type=text/javascript src=/note/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/note/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/note/lib/sharer/sharer.min.js></script><script type=text/javascript src=/note/lib/katex/katex.min.js></script><script type=text/javascript src=/note/lib/katex/contrib/auto-render.min.js></script><script type=text/javascript src=/note/lib/katex/contrib/copy-tex.min.js></script><script type=text/javascript src=/note/lib/katex/contrib/mhchem.min.js></script><script type=text/javascript src=/note/lib/cookieconsent/cookieconsent.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:50},comment:{},cookieconsent:{content:{dismiss:"Got it!",link:"Learn more",message:"This website uses Cookies to improve your experience."},enable:!0,palette:{button:{background:"#f0f0f0"},popup:{background:"#1aa3ff"}},theme:"edgeless"},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{highlightTag:"em",lunrIndexURL:"/note/index.json",maxResultLength:10,noResultsFound:"No results found",snippetLength:50,type:"lunr"}}</script><script type=text/javascript src=/note/js/theme.min.js></script></body></html>
