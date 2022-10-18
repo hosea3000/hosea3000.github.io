@@ -1,7 +1,7 @@
 ---
 title: "Portainer 的使用"
 date: 2022-10-18T22:38:15+08:00
-draft: true
+draft: false
 ---
 
 ### 运行面板
@@ -14,7 +14,7 @@ docker run -d -p 9000:9000 --restart=always -v /var/run/docker.sock:/var/run/doc
 
 ### 安装 Agent
 
-在Portainier的架构中，管理节点是Portainer Server，被管理节点通过部署Agent来与Server通信。
+在Portainer的架构中，管理节点是Portainer Server，被管理节点通过部署Agent来与Server通信。
 
 按照网络环境的不同，Portainer将Agent分为两种： `Portainer Agent` 和 `Edge Agent`。
 
