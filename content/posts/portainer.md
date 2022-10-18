@@ -11,7 +11,6 @@ docker run -d -p 9000:9000 --restart=always -v /var/run/docker.sock:/var/run/doc
 ```
 
 
-
 ### 安装 Agent
 
 在Portainer的架构中，管理节点是Portainer Server，被管理节点通过部署Agent来与Server通信。

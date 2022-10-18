@@ -4,6 +4,9 @@ date: 2022-10-18T19:12:11+08:00
 draft: false
 tags: ["aa"]
 categories: ["aaa", "bbbb"]
+
+featuredImage: "/note/images/goreleaser.png"
+featuredImagePreview: "images/goreleaser.png"
 ---
 
 ### 安装 oh-my-zsh
