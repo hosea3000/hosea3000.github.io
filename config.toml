@@ -73,6 +73,14 @@ post = ""
 name = "分类"
 url = "categories/"
 title = ""
+[[menu.main]]
+weight = 5
+identifier = "golang"
+pre = ""
+post = ""
+name = "Golang"
+url = "golang/"
+title = ""
 
 [params]
 # 网站默认主题样式 ["auto", "light", "dark"]
