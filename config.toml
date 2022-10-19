@@ -39,14 +39,6 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
 # 菜单配置
 [menu]
 [[menu.main]]
-    weight = 1
-    identifier = "index"
-    pre = ""
-    post = ""
-    name = "主页"
-    url = ""
-    title = ""
-[[menu.main]]
     weight = 2
     identifier = "posts"
     # 你可以在名称 (允许 HTML 格式) 之前添加其他信息, 例如图标
@@ -72,14 +64,6 @@ title = ""
     post = ""
     name = "分类"
     url = "categories/"
-    title = ""
-[[menu.main]]
-    weight = 5
-    identifier = "golang"
-    pre = ""
-    post = ""
-    name = "Golang"
-    url = "golang/"
     title = ""
 
 [params]
@@ -132,9 +116,9 @@ title = ""
     # 网站创立年份
     since = 2022
     # ICP 备案信息，仅在中国使用 (支持 HTML 格式)
-    icp = ""
+    icp = '<a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank">湘ICP备2021009721号</a>'
     # 许可协议信息 (支持 HTML 格式)
-    license = '<a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a>'
+    license = ''
 
 # LoveIt 新增 | 0.2.0 Section (所有文章) 页面配置
 [params.section]
