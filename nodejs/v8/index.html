@@ -1,0 +1,152 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>V8 的内存限制与垃圾回收 - Hosea 的个人笔记</title><meta name=Description content="hosea的学习笔记"><meta property="og:title" content="V8 的内存限制与垃圾回收"><meta property="og:description" content="V8 的内存限制与垃圾回收 V8 的内存限制 node 使用 V8 作为 javaScript 脚本引擎 v8 的内存限制和对象分配 v8 中所有 javascript 对象都是通过堆内存进行分配的 内存限制：64 位系统大约"><meta property="og:type" content="article"><meta property="og:url" content="https://hosea3000.github.io/nodejs/v8/"><meta property="og:image" content="https://hosea3000.github.io/logo.png"><meta property="article:section" content="nodejs"><meta property="article:published_time" content="2022-10-21T02:02:33+08:00"><meta property="article:modified_time" content="2022-10-21T02:26:21+08:00"><meta property="og:site_name" content="hosea的学习笔记"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://hosea3000.github.io/logo.png"><meta name=twitter:title content="V8 的内存限制与垃圾回收"><meta name=twitter:description content="V8 的内存限制与垃圾回收 V8 的内存限制 node 使用 V8 作为 javaScript 脚本引擎 v8 的内存限制和对象分配 v8 中所有 javascript 对象都是通过堆内存进行分配的 内存限制：64 位系统大约"><meta name=application-name content="hosea的个人笔记"><meta name=apple-mobile-web-app-title content="hosea的个人笔记"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hosea3000.github.io/nodejs/v8/><link rel=prev href=https://hosea3000.github.io/nodejs/workthred/><link rel=next href=https://hosea3000.github.io/nodejs/npm/><link rel=stylesheet href=/css/style.min.css><link rel=preload href=/lib/fontawesome-free/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/lib/animate/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"V8 的内存限制与垃圾回收","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hosea3000.github.io\/nodejs\/v8\/"},"genre":"nodejs","wordcount":1360,"url":"https:\/\/hosea3000.github.io\/nodejs\/v8\/","datePublished":"2022-10-21T02:02:33+08:00","dateModified":"2022-10-21T02:26:21+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"Hosea"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title="Hosea 的个人笔记">hosea</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/categories/ title=所有分类>分类 </a><a class=menu-item href=/posts/>文章 </a><a class=menu-item href=/nodejs/>Node.js </a><a class=menu-item href=/golang/ title=Golang>Golang </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder="Search titles or contents..." id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span>
+</span><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme"><i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title="Hosea 的个人笔记">hosea</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder="Search titles or contents..." id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/categories/ title=所有分类>分类</a><a class=menu-item href=/posts/ title>文章</a><a class=menu-item href=/nodejs/ title>Node.js</a><a class=menu-item href=/golang/ title=Golang>Golang</a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class="page single special"><h1 class="single-title animate__animated animate__pulse animate__faster">V8 的内存限制与垃圾回收</h1><div class=content id=content><h1 id=v8-的内存限制与垃圾回收>V8 的内存限制与垃圾回收</h1><h3 id=v8-的内存限制>V8 的内存限制</h3><p>node 使用 V8 作为 javaScript 脚本引擎</p><h4 id=v8-的内存限制和对象分配>v8 的内存限制和对象分配</h4><ul><li>v8 中所有 javascript 对象都是通过堆内存进行分配的</li><li>内存限制：64 位系统大约 1.4G，32 位系统大约 0.7G, 当总使用内存超过 1.4G 之后就会 OOM(Out Of Memory)。进程会直接退出</li></ul><h4 id=为何要内存限制>为何要内存限制</h4><ul><li>表层原因为 v8 最初为浏览器设计，不太可能遇到大量的内存的场景。对于网页来说，v8 的限制已经绰绰有余</li><li>深层原因是 v8 的垃圾回收机制的限制.
+1.4G V8 进行一次垃圾回收需要的时间大约是 50ms, 阻塞主线程</li></ul><h4 id=自定义内存限制>自定义内存限制</h4><p>这两个值必须启动的时候指定, 启动后无法修改, 所以 V8 内存无法根据情况自动扩容</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>node --max-old-space-size<span class=o>=</span><span class=m>1700</span> test.js // 单位为MB
+</span></span><span class=line><span class=cl>node --max-new-space-size<span class=o>=</span><span class=m>1024</span> test.js // 单位为KB
+</span></span></code></pre></td></tr></table></div></div><h4 id=查看内存>查看内存</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=nx>process</span><span class=p>.</span><span class=nx>memoryUsage</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>rss</span><span class=o>:</span> <span class=mi>23863296</span><span class=p>,</span> <span class=c1>// rss是Resident Set Size的缩写，为常驻内存的总大小
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=nx>heapTotal</span><span class=o>:</span> <span class=mi>6057984</span><span class=p>,</span> <span class=c1>// 已经申请到的堆内存
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=nx>heapUsed</span><span class=o>:</span> <span class=mi>2523608</span><span class=p>,</span> <span class=c1>// 当前使用的堆内存
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=nx>external</span><span class=o>:</span> <span class=mi>1270913</span> <span class=c1>// 堆外内存
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 查看操作系统总内存
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>os</span><span class=p>.</span><span class=nx>totalmem</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 查看操作系统的空闲内存
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>os</span><span class=p>.</span><span class=nx>freemem</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=垃圾回收>垃圾回收</h3><h3 id=新生代和老生代>新生代和老生代</h3><p>V8 将内存分为两类：新生代内存空间和老生代内存空间，新生代内存空间主要用来存放存活时间较短的对象，老生代内存空间主要用来存放存活时间较长的对象。对于垃圾回收，新生代和老生代有各自不同的策略</p><h3 id=新生代的垃圾回收scavenge>新生代的垃圾回收(Scavenge)</h3><p>新生代需要清理的存活对象较少, 所以选择复制存活对象的算法</p><p>具体实现时主要采用了 Cheney 算法。Cheney 将内存空间一分为二， 一个处于使用，一个处于闲置。处于使用中的也叫作 From，处于闲置中的也叫作 To。垃圾回收的过程就是将 From 中存活的对象复制到 To 中</p><ol><li>在垃圾回收的过程中，如果发现某个对象之前被清理过，那么会将其晋升到老生代内存空间中</li><li>当要从 From 复制一个对象到 To 空间时，如果 To 空间中的使用量已经超过了 25%，那么就将 From 中的对象直接晋升到老生代内存空间中</li><li>缺点是只是用了一半的内存, 优点是速度快</li></ol><h3 id=老生代的垃圾回收mark-sweep--mark-compact>老生代的垃圾回收(Mark Sweep & Mark Compact)</h3><p>老生代中存活的对象较多, 需要清理的对象较少, 所以选择清楚死亡对象的算法</p><h4 id=mark-sweep标记清除>Mark Sweep(标记清除)</h4><p>分为标记和清除两个阶段, 在标记阶段标记所有存活的对象, 在清除阶段清除所有标记的对象
+缺点: 会产生内存碎片</p><h4 id=mark-compact标记整理>Mark Compact(标记整理)</h4><p>在整理的过程中将存活的对象往一端移动, 移动完成后, 直接清理掉边界内存
+缺点: 速度慢</p><h4 id=什么时候执行-gc>什么时候执行 GC</h4><ol><li>定时 GC</li><li>内存不够分配时</li><li>手动 GC</li></ol><h4 id=总结>总结</h4><p>V8 主要是 Mark Sweep 算法回收内存, 在空间不足以分配给新生代晋升的对象时才会采用 Mark Compact 方式进行垃圾回收</p><h4 id=查看垃圾回收日志>查看垃圾回收日志</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// $ node --trace_gc
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=c1>// 全局作用域的GC
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>arr</span> <span class=o>=</span> <span class=p>[];</span>
+</span></span><span class=line><span class=cl><span class=k>for</span> <span class=p>(</span><span class=kd>let</span> <span class=nx>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span> <span class=o>&lt;</span> <span class=mi>3000</span> <span class=o>*</span> <span class=mi>10000</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>arr</span><span class=p>.</span><span class=nx>push</span><span class=p>(</span><span class=nx>i</span> <span class=o>+</span> <span class=s1>&#39;test&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=nx>arr</span> <span class=o>=</span> <span class=kc>undefined</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=nx>process</span><span class=p>.</span><span class=nx>memoryUsage</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 方法作用域的垃圾回收(连续调用两次)
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>function</span> <span class=nx>test</span><span class=p>(</span><span class=nx>num</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kd>let</span> <span class=nx>arr</span> <span class=o>=</span> <span class=p>[];</span>
+</span></span><span class=line><span class=cl>  <span class=k>for</span> <span class=p>(</span><span class=kd>let</span> <span class=nx>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span> <span class=o>&lt;</span> <span class=mi>10000</span> <span class=o>*</span> <span class=nx>num</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>arr</span><span class=p>.</span><span class=nx>push</span><span class=p>(</span><span class=nx>i</span> <span class=o>+</span> <span class=s1>&#39;test&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=nx>arr</span> <span class=o>=</span> <span class=kc>undefined</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=nx>process</span><span class=p>.</span><span class=nx>memoryUsage</span><span class=p>();</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=手动进行垃圾回收>手动进行垃圾回收</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// $ node --expose-gc
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>global</span><span class=p>.</span><span class=nx>gc</span><span class=p>();</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=内存使用>内存使用</h3><h4 id=1-作用域>1. 作用域</h4><p>将变量声明在作用域内有利于垃圾回收, 避免使用全局变量</p><h4 id=2-闭包>2. 闭包</h4><p>闭包会导致垃圾回收失效, 尽量减少使用</p><h4 id=3-使用堆外内存>3. 使用堆外内存</h4><p>将对象以 Buffer 的形式保存, Buffer 不受 V8 内存限制</p><h4 id=4-使用-stream>4. 使用 Stream</h4><p>使用 Stream 避免一次读取过多的数据到内存(要使用 pipe)</p><h3 id=内存泄露排查工具>内存泄露排查工具</h3><ul><li><a href=https://www.ctolib.com/topics-118921.html target=_blank rel="noopener noreffer">heapdump+chrome devTools</a></li><li><a href=https://www.jianshu.com/p/791a9ba77abb target=_blank rel="noopener noreffer">easy-monitor</a></li></ul><p>以上内容主要来自&lt;深入浅出 Node.js> 第五章</p><h3 id=内存打印工具>内存打印工具</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm> * 封装 print 方法输出内存占用信息
+</span></span></span><span class=line><span class=cl><span class=cm> */</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>print</span> <span class=o>=</span> <span class=kd>function</span> <span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>memoryUsage</span> <span class=o>=</span> <span class=nx>process</span><span class=p>.</span><span class=nx>memoryUsage</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm>   * 单位为字节格式为 MB 输出
+</span></span></span><span class=line><span class=cl><span class=cm>   */</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>format</span> <span class=o>=</span> <span class=kd>function</span> <span class=p>(</span><span class=nx>bytes</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=p>(</span><span class=nx>bytes</span> <span class=o>/</span> <span class=mi>1024</span> <span class=o>/</span> <span class=mi>1024</span><span class=p>).</span><span class=nx>toFixed</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span> <span class=o>+</span> <span class=s1>&#39; MB&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=nx>JSON</span><span class=p>.</span><span class=nx>stringify</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>      <span class=nx>rss</span><span class=o>:</span> <span class=nx>format</span><span class=p>(</span><span class=nx>memoryUsage</span><span class=p>.</span><span class=nx>rss</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>      <span class=nx>heapTotal</span><span class=o>:</span> <span class=nx>format</span><span class=p>(</span><span class=nx>memoryUsage</span><span class=p>.</span><span class=nx>heapTotal</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>      <span class=nx>heapUsed</span><span class=o>:</span> <span class=nx>format</span><span class=p>(</span><span class=nx>memoryUsage</span><span class=p>.</span><span class=nx>heapUsed</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>      <span class=nx>external</span><span class=o>:</span> <span class=nx>format</span><span class=p>(</span><span class=nx>memoryUsage</span><span class=p>.</span><span class=nx>external</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=p>})</span>
+</span></span><span class=line><span class=cl>  <span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>test</span><span class=p>(){</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>arr</span> <span class=o>==</span><span class=p>[]</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=p>()=&gt;{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>arr</span><span class=p>.</span><span class=nx>push</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>fun</span> <span class=o>=</span> <span class=nx>test</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>fun</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div></div></div></div></main><footer class=footer><div class=footer-container><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://hosea3000.github.io/ target=_blank>Hosea</a></span><span class=icp-splitter>&nbsp;|&nbsp;</span><br class=icp-br><span class=icp><a href=https://beian.miit.gov.cn/#/Integrated/index target=_blank>湘ICP备2021009721号</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
+</a><a href=# id=view-comments class=fixed-button title="View Comments"><i class="fas fa-comment fa-fw" aria-hidden=true></i></a></div><link rel=stylesheet href=/lib/katex/katex.min.css><link rel=stylesheet href=/lib/cookieconsent/cookieconsent.min.css><script type=text/javascript src=/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/lib/lunr/lunr.min.js></script><script type=text/javascript src=/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/lib/twemoji/twemoji.min.js></script><script type=text/javascript src=/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/lib/katex/katex.min.js></script><script type=text/javascript src=/lib/katex/contrib/auto-render.min.js></script><script type=text/javascript src=/lib/katex/contrib/copy-tex.min.js></script><script type=text/javascript src=/lib/katex/contrib/mhchem.min.js></script><script type=text/javascript src=/lib/cookieconsent/cookieconsent.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:50},comment:{},cookieconsent:{content:{dismiss:"Got it!",link:"Learn more",message:"This website uses Cookies to improve your experience."},enable:!0,palette:{button:{background:"#f0f0f0"},popup:{background:"#1aa3ff"}},theme:"edgeless"},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{highlightTag:"em",lunrIndexURL:"/index.json",maxResultLength:10,noResultsFound:"No results found",snippetLength:50,type:"lunr"},twemoji:!0}</script><script type=text/javascript src=/js/theme.min.js></script></body></html>

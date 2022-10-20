@@ -1,0 +1,471 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>进程和线程 - Hosea 的个人笔记</title><meta name=Description content="hosea的学习笔记"><meta property="og:title" content="进程和线程"><meta property="og:description" content="进程和线程 进程: 系统进行资源分配和调度的基本单位 线程: 程序执行的最小单位(CPU 调度的最小单位) 进程是线程的容器, 一个进程可以拥有多个线程,"><meta property="og:type" content="article"><meta property="og:url" content="https://hosea3000.github.io/nodejs/process/"><meta property="og:image" content="https://hosea3000.github.io/logo.png"><meta property="article:section" content="nodejs"><meta property="article:published_time" content="2022-10-21T02:02:33+08:00"><meta property="article:modified_time" content="2022-10-21T02:26:21+08:00"><meta property="og:site_name" content="hosea的学习笔记"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://hosea3000.github.io/logo.png"><meta name=twitter:title content="进程和线程"><meta name=twitter:description content="进程和线程 进程: 系统进行资源分配和调度的基本单位 线程: 程序执行的最小单位(CPU 调度的最小单位) 进程是线程的容器, 一个进程可以拥有多个线程,"><meta name=application-name content="hosea的个人笔记"><meta name=apple-mobile-web-app-title content="hosea的个人笔记"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hosea3000.github.io/nodejs/process/><link rel=prev href=https://hosea3000.github.io/nodejs/interview/><link rel=next href=https://hosea3000.github.io/nodejs/promise/><link rel=stylesheet href=/css/style.min.css><link rel=preload href=/lib/fontawesome-free/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/lib/animate/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"进程和线程","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hosea3000.github.io\/nodejs\/process\/"},"genre":"nodejs","wordcount":3388,"url":"https:\/\/hosea3000.github.io\/nodejs\/process\/","datePublished":"2022-10-21T02:02:33+08:00","dateModified":"2022-10-21T02:26:21+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"Hosea"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title="Hosea 的个人笔记">hosea</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/categories/ title=所有分类>分类 </a><a class=menu-item href=/posts/>文章 </a><a class=menu-item href=/nodejs/>Node.js </a><a class=menu-item href=/golang/ title=Golang>Golang </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder="Search titles or contents..." id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span>
+</span><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme"><i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title="Hosea 的个人笔记">hosea</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder="Search titles or contents..." id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/categories/ title=所有分类>分类</a><a class=menu-item href=/posts/ title>文章</a><a class=menu-item href=/nodejs/ title>Node.js</a><a class=menu-item href=/golang/ title=Golang>Golang</a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class="page single special"><h1 class="single-title animate__animated animate__pulse animate__faster">进程和线程</h1><div class=content id=content><h3 id=进程和线程>进程和线程</h3><p>进程: 系统进行资源分配和调度的基本单位
+线程: 程序执行的最小单位(CPU 调度的最小单位)
+进程是线程的容器, 一个进程可以拥有多个线程,
+每个进程都拥有自己的独立空间地址、数据栈
+一个进程无法访问另外一个进程里定义的变量、数据结构，只有建立了 IPC 通信，进程之间才可数据共享</p><h3 id=javascript-的单线程>Javascript 的单线程</h3><p>Javascript 就是属于单线程，程序顺序执行，可以想象一下队列，前面一个执行完之后，后面才可以执行，当你在使用单线程语言编码时切勿有过多耗时的同步操作，否则线程会造成阻塞，导致后续响应无法处理。你如果采用 Javascript 进行编码时候，请尽可能的使用异步操作。</p><h4 id=cpu-计算阻塞的例子>CPU 计算阻塞的例子</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>computation</span> <span class=o>=</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kd>let</span> <span class=nx>sum</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>info</span><span class=p>(</span><span class=s1>&#39;计算开始&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>time</span><span class=p>(</span><span class=s1>&#39;计算耗时&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>for</span> <span class=p>(</span><span class=kd>let</span> <span class=nx>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span> <span class=o>&lt;</span> <span class=mf>1e10</span><span class=p>;</span> <span class=nx>i</span> <span class=o>+=</span> <span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>sum</span> <span class=o>+=</span> <span class=nx>i</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>info</span><span class=p>(</span><span class=s1>&#39;计算结束&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>timeEnd</span><span class=p>(</span><span class=s1>&#39;计算耗时&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=nx>sum</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><p>因为上面的例子是 CPU 计算, 所以耗时时间比较长, 下面拿这个方法来测试 CPU 计算阻塞 WEB 服务的例子</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// compute.js
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=nx>computation</span> <span class=o>=</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kd>let</span> <span class=nx>sum</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>info</span><span class=p>(</span><span class=s1>&#39;计算开始&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>time</span><span class=p>(</span><span class=s1>&#39;计算耗时&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>for</span> <span class=p>(</span><span class=kd>let</span> <span class=nx>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span> <span class=o>&lt;</span> <span class=mf>1e10</span><span class=p>;</span> <span class=nx>i</span> <span class=o>+=</span> <span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>sum</span> <span class=o>+=</span> <span class=nx>i</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>info</span><span class=p>(</span><span class=s1>&#39;计算结束&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>timeEnd</span><span class=p>(</span><span class=s1>&#39;计算耗时&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=nx>sum</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>module</span><span class=p>.</span><span class=nx>exports</span> <span class=o>=</span> <span class=p>{</span> <span class=nx>computation</span> <span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><p>再启用一个 web 服务</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// index.js
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=nx>http</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;http&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=p>{</span> <span class=nx>computation</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;./compute&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>server</span> <span class=o>=</span> <span class=nx>http</span><span class=p>.</span><span class=nx>createServer</span><span class=p>((</span><span class=nx>req</span><span class=p>,</span> <span class=nx>res</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>req</span><span class=p>.</span><span class=nx>url</span> <span class=o>===</span> <span class=s1>&#39;/compute&#39;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>computation</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=nx>res</span><span class=p>.</span><span class=nx>end</span><span class=p>(</span><span class=s1>&#39;compute ok&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>req</span><span class=p>.</span><span class=nx>url</span> <span class=o>===</span> <span class=s1>&#39;/ping&#39;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>res</span><span class=p>.</span><span class=nx>end</span><span class=p>(</span><span class=s1>&#39;req pong&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>server</span><span class=p>.</span><span class=nx>listen</span><span class=p>(</span><span class=mi>3000</span><span class=p>,</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;http start, listen on port 3000&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><p>启动服务开始测试:</p><ol><li>访问链接: <code>http://localhost:3000/ping</code> 会很快得到服务器响应 <code>req pong</code></li><li>访问链接: <code>http://localhost:3000/compute</code> 服务器开始计算, 短时间内无响应</li><li>再次访问链接: <code>http://localhost:3000/ping</code> 也会被卡主</li><li>等待链接: <code>http://localhost:3000/compute</code> 计算完成, 正确返回</li><li>再次访问链接: <code>http://localhost:3000/ping</code> 能正常访问</li></ol><p>之前我一直有一个误区, 认为<code>将这些计算耗时的操作异步去执行就不会阻塞WEB服务</code>. 显然这样是错误的认知, 这是将异步和非阻塞两个概念弄混了. 异步调用这个方法, 只会改变计算的时间片(也就是在不同的事件循环中执行而已), 而计算还是在主线程上执行.</p><p>结论:
+Node.js 虽然是单线程模型，但是其基于事件驱动、异步非阻塞模式，可以应用于高并发场景，避免了线程创建、线程之间上下文切换所产生的资源开销。但是不合适<code>CPU密集</code>的场景</p><h3 id=多进程>多进程</h3><p>在 CPU 密集型的业务场景下, 单进程就不适用了, 可以考虑多进程
+针对上一个问题可以考虑再起一个进程去执行计算, 等到计算完成通知主进程</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// compute.js
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=nx>computation</span> <span class=o>=</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kd>let</span> <span class=nx>sum</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>info</span><span class=p>(</span><span class=s1>&#39;计算开始&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>time</span><span class=p>(</span><span class=s1>&#39;计算耗时&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>for</span> <span class=p>(</span><span class=kd>let</span> <span class=nx>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span> <span class=o>&lt;</span> <span class=mf>1e10</span><span class=p>;</span> <span class=nx>i</span> <span class=o>+=</span> <span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>sum</span> <span class=o>+=</span> <span class=nx>i</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>info</span><span class=p>(</span><span class=s1>&#39;计算结束&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>timeEnd</span><span class=p>(</span><span class=s1>&#39;计算耗时&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=nx>sum</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>process</span><span class=p>.</span><span class=nx>on</span><span class=p>(</span><span class=s1>&#39;message&#39;</span><span class=p>,</span> <span class=p>(</span><span class=nx>msg</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>msg</span><span class=p>,</span> <span class=s1>&#39;process.pid&#39;</span><span class=p>,</span> <span class=nx>process</span><span class=p>.</span><span class=nx>pid</span><span class=p>);</span> <span class=c1>// 子进程id
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kr>const</span> <span class=nx>sum</span> <span class=o>=</span> <span class=nx>computation</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>  <span class=c1>// 如果Node.js进程是通过进程间通信产生的，那么，process.send()方法可以用来给父进程发送消息
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=nx>process</span><span class=p>.</span><span class=nx>send</span><span class=p>(</span><span class=nx>sum</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><p>主进程开启一个 http 服务, 当需要计算的请求进来是 fork 一个子进程计算, 计算完成返回给客户端, 其他请求不影响, 不会阻塞服务器</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>http</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;http&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=p>{</span> <span class=nx>fork</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;child_process&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>server</span> <span class=o>=</span> <span class=nx>http</span><span class=p>.</span><span class=nx>createServer</span><span class=p>((</span><span class=nx>req</span><span class=p>,</span> <span class=nx>res</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>req</span><span class=p>.</span><span class=nx>url</span> <span class=o>===</span> <span class=s1>&#39;/compute&#39;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>childProcess</span> <span class=o>=</span> <span class=nx>fork</span><span class=p>(</span><span class=s1>&#39;./compute&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nx>childProcess</span><span class=p>.</span><span class=nx>send</span><span class=p>(</span><span class=s1>&#39;开启一个新的子进程&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 当一个子进程使用 process.send() 发送消息时会触发 &#39;message&#39; 事件
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>childProcess</span><span class=p>.</span><span class=nx>on</span><span class=p>(</span><span class=s1>&#39;message&#39;</span><span class=p>,</span> <span class=p>(</span><span class=nx>sum</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>res</span><span class=p>.</span><span class=nx>end</span><span class=p>(</span><span class=sb>`Sum is </span><span class=si>${</span><span class=nx>sum</span><span class=si>}</span><span class=sb>`</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=nx>childProcess</span><span class=p>.</span><span class=nx>kill</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 子进程监听到一些错误消息退出
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>childProcess</span><span class=p>.</span><span class=nx>on</span><span class=p>(</span><span class=s1>&#39;close&#39;</span><span class=p>,</span> <span class=p>(</span><span class=nx>code</span><span class=p>,</span> <span class=nx>signal</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=sb>`收到close事件，子进程收到信号 </span><span class=si>${</span><span class=nx>signal</span><span class=si>}</span><span class=sb> 而终止，退出码 </span><span class=si>${</span><span class=nx>code</span><span class=si>}</span><span class=sb>`</span>
+</span></span><span class=line><span class=cl>      <span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=nx>childProcess</span><span class=p>.</span><span class=nx>kill</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>      <span class=nx>res</span><span class=p>.</span><span class=nx>end</span><span class=p>(</span><span class=s1>&#39;compute ok&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>req</span><span class=p>.</span><span class=nx>url</span> <span class=o>===</span> <span class=s1>&#39;/ping&#39;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>res</span><span class=p>.</span><span class=nx>end</span><span class=p>(</span><span class=s1>&#39;req pong&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>server</span><span class=p>.</span><span class=nx>listen</span><span class=p>(</span><span class=mi>3000</span><span class=p>,</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;http start, listen on port 3000&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><p>这样子实现的差别就是:
+<code>compute</code> 接口等待服务器计算完成的响应时, <code>ping</code> 接口能够正确响应, 不收影响</p><p>多线程的代价还在于创建新的线程和执行期上下文线程的切换开销，由于每创建一个线程就会占用一定的内存，当应用程序并发大了之后，内存将会很快耗尽。类似于上面单线程模型中例举的例子，需要一定的计算会造成当前线程阻塞的，还是推荐使用多线程来处理</p><h3 id=nodejs-的多进程>Node.js 的多进程</h3><p>Node.js 是 Javascript 在服务端的运行环境，构建在 chrome 的 V8 引擎之上，基于事件驱动、非阻塞 I/O 模型，充分利用操作系统提供的异步 I/O 进行多任务的执行，适合于 I/O 密集型的应用场景.</p><p>针对于多核 CPU 的服务器, 如果只启用一个进程,无疑是浪费了机器的性能. 多核 CPU 系统之上，可以用过 child_process.fork 开启多个进程（Node.js 在 v0.8 版本之后新增了 Cluster 来实现多进程架构） ，即 多进程 + 单线程 模式。
+注意：<code>开启多进程不是为了解决高并发，主要是解决了单进程模式下 Node.js CPU 利用率不足的情况，充分利用多核 CPU 的性能</code>。</p><h4 id=创建进程的方式>创建进程的方式</h4><ul><li>child_process.spawn()：适用于返回大量数据，例如图像处理，二进制数据处理。</li><li>child_process.exec()：适用于小量数据，maxBuffer 默认值为 200 * 1024 超出这个默认值将会导致程序崩溃，数据量过大可采用 spawn。</li><li>child_process.execFile()：类似 child_process.exec()，区别是不能通过 shell 来执行，不支持像 I/O 重定向和文件查找这样的行为</li><li>child_process.fork()： 衍生新的进程，进程之间是相互独立的，每个进程都有自己的 V8 实例、内存，系统资源是有限的，不建议衍生太多的子进程出来，通长根据系统 CPU 核心数设置。</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=p>{</span> <span class=nx>spawn</span><span class=p>,</span> <span class=nx>exec</span><span class=p>,</span> <span class=nx>execFile</span><span class=p>,</span> <span class=nx>fork</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;child_process&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>spawn</span><span class=p>(</span><span class=s1>&#39;ls&#39;</span><span class=p>,</span> <span class=p>[</span><span class=s1>&#39;-l&#39;</span><span class=p>],</span> <span class=p>{</span> <span class=nx>cwd</span><span class=o>:</span> <span class=s1>&#39;/usr&#39;</span> <span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>exec</span><span class=p>(</span><span class=s1>&#39;node -v&#39;</span><span class=p>,</span> <span class=p>(</span><span class=nx>error</span><span class=p>,</span> <span class=nx>stdout</span><span class=p>,</span> <span class=nx>stderr</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>({</span> <span class=nx>error</span><span class=p>,</span> <span class=nx>stdout</span><span class=p>,</span> <span class=nx>stderr</span> <span class=p>});</span> <span class=c1>// { error: null, stdout: &#39;v8.5.0\n&#39;, stderr: &#39;&#39; }
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>execFile</span><span class=p>(</span><span class=s1>&#39;node&#39;</span><span class=p>,</span> <span class=p>[</span><span class=s1>&#39;-v&#39;</span><span class=p>],</span> <span class=p>(</span><span class=nx>error</span><span class=p>,</span> <span class=nx>stdout</span><span class=p>,</span> <span class=nx>stderr</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>({</span> <span class=nx>error</span><span class=p>,</span> <span class=nx>stdout</span><span class=p>,</span> <span class=nx>stderr</span> <span class=p>});</span> <span class=c1>// { error: null, stdout: &#39;v8.5.0\n&#39;, stderr: &#39;&#39; }
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>childFork</span> <span class=o>=</span> <span class=nx>fork</span><span class=p>(</span><span class=s1>&#39;./http-server.js&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>childFork</span><span class=p>.</span><span class=nx>pid</span><span class=p>);</span> <span class=c1>// process.pid:  57252
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=创建多进程的-web-服务器>创建多进程的 web 服务器</h3><h4 id=主进程>主进程</h4><p>master.js 主要处理以下逻辑：</p><ul><li>创建一个 server 并监听 3000 端口。</li><li>根据系统 cpus 开启多个子进程</li><li>通过子进程对象的 send 方法发送消息到子进程进行通信</li><li>在主进程中监听了子进程的变化，如果是自杀信号重新启动一个工作进程。</li><li>主进程在监听到退出消息的时候，先退出子进程在退出主进程</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>cpus</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;os&#39;</span><span class=p>).</span><span class=nx>cpus</span><span class=p>();</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=p>{</span> <span class=nx>fork</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;child_process&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>server</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;net&#39;</span><span class=p>).</span><span class=nx>createServer</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>server</span><span class=p>.</span><span class=nx>listen</span><span class=p>(</span><span class=mi>3000</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nx>process</span><span class=p>.</span><span class=nx>title</span> <span class=o>=</span> <span class=s1>&#39;node-master&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>workers</span> <span class=o>=</span> <span class=p>{};</span>
+</span></span><span class=line><span class=cl><span class=kd>function</span> <span class=nx>createWorker</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>worker</span> <span class=o>=</span> <span class=nx>fork</span><span class=p>(</span><span class=s1>&#39;./worker.js&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nx>worker</span><span class=p>.</span><span class=nx>on</span><span class=p>(</span><span class=s1>&#39;message&#39;</span><span class=p>,</span> <span class=p>(</span><span class=nx>message</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=nx>message</span><span class=p>.</span><span class=nx>act</span> <span class=o>===</span> <span class=s1>&#39;suicide&#39;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>createWorker</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>worker</span><span class=p>.</span><span class=nx>on</span><span class=p>(</span><span class=s1>&#39;exit&#39;</span><span class=p>,</span> <span class=p>(</span><span class=nx>code</span><span class=p>,</span> <span class=nx>signal</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;worker process exited, code: %s signal: %s&#39;</span><span class=p>,</span> <span class=nx>code</span><span class=p>,</span> <span class=nx>signal</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>delete</span> <span class=nx>workers</span><span class=p>[</span><span class=nx>worker</span><span class=p>.</span><span class=nx>pid</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>  <span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>worker</span><span class=p>.</span><span class=nx>send</span><span class=p>(</span><span class=s1>&#39;server&#39;</span><span class=p>,</span> <span class=nx>server</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nx>workers</span><span class=p>[</span><span class=nx>worker</span><span class=p>.</span><span class=nx>pid</span><span class=p>]</span> <span class=o>=</span> <span class=nx>worker</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;worker process created, pid: %s ppid: %s&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>worker</span><span class=p>.</span><span class=nx>pid</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>process</span><span class=p>.</span><span class=nx>pid</span>
+</span></span><span class=line><span class=cl>  <span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>for</span> <span class=p>(</span><span class=kd>let</span> <span class=nx>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span> <span class=o>&lt;</span> <span class=nx>cpus</span><span class=p>.</span><span class=nx>length</span><span class=p>;</span> <span class=nx>i</span> <span class=o>+=</span> <span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>createWorker</span><span class=p>();</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>function</span> <span class=nx>close</span><span class=p>(</span><span class=nx>code</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;进程退出！&#39;</span><span class=p>,</span> <span class=nx>code</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>code</span> <span class=o>!==</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=p>(</span><span class=kr>const</span> <span class=nx>pid</span> <span class=k>of</span> <span class=nb>Object</span><span class=p>.</span><span class=nx>keys</span><span class=p>(</span><span class=nx>workers</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;master process exited, kill worker pid: &#39;</span><span class=p>,</span> <span class=nx>pid</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=nx>workers</span><span class=p>[</span><span class=nx>pid</span><span class=p>].</span><span class=nx>kill</span><span class=p>(</span><span class=s1>&#39;SIGINT&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>process</span><span class=p>.</span><span class=nx>exit</span><span class=p>(</span><span class=mi>0</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>process</span><span class=p>.</span><span class=nx>once</span><span class=p>(</span><span class=s1>&#39;SIGINT&#39;</span><span class=p>,</span> <span class=nx>close</span><span class=p>.</span><span class=nx>bind</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s1>&#39;SIGINT&#39;</span><span class=p>));</span> <span class=c1>// kill(2) Ctrl-C
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>process</span><span class=p>.</span><span class=nx>once</span><span class=p>(</span><span class=s1>&#39;SIGQUIT&#39;</span><span class=p>,</span> <span class=nx>close</span><span class=p>.</span><span class=nx>bind</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s1>&#39;SIGQUIT&#39;</span><span class=p>));</span> <span class=c1>// kill(3) Ctrl-\
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>process</span><span class=p>.</span><span class=nx>once</span><span class=p>(</span><span class=s1>&#39;SIGTERM&#39;</span><span class=p>,</span> <span class=nx>close</span><span class=p>.</span><span class=nx>bind</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s1>&#39;SIGTERM&#39;</span><span class=p>));</span> <span class=c1>// kill(15) default
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>process</span><span class=p>.</span><span class=nx>once</span><span class=p>(</span><span class=s1>&#39;exit&#39;</span><span class=p>,</span> <span class=nx>close</span><span class=p>.</span><span class=nx>bind</span><span class=p>(</span><span class=k>this</span><span class=p>));</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=工作进程>工作进程</h4><p>worker.js 子进程处理逻辑如下：</p><ul><li>创建一个 server 对象，注意这里最开始并没有监听 3000 端口</li><li>通过 message 事件接收主进程 send 方法发送的消息</li><li>监听 uncaughtException 事件，捕获未处理的异常，发送自杀信息由主进程重建进程，子进程在链接关闭之后退出</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>http</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;http&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>server</span> <span class=o>=</span> <span class=nx>http</span><span class=p>.</span><span class=nx>createServer</span><span class=p>((</span><span class=nx>req</span><span class=p>,</span> <span class=nx>res</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>res</span><span class=p>.</span><span class=nx>writeHead</span><span class=p>(</span><span class=mi>200</span><span class=p>,</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;Content-Type&#39;</span><span class=o>:</span> <span class=s1>&#39;text/plan&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=p>});</span>
+</span></span><span class=line><span class=cl>  <span class=nx>res</span><span class=p>.</span><span class=nx>end</span><span class=p>(</span><span class=sb>`I am worker, pid: </span><span class=si>${</span><span class=nx>process</span><span class=p>.</span><span class=nx>pid</span><span class=si>}</span><span class=sb>, ppid: </span><span class=si>${</span><span class=nx>process</span><span class=p>.</span><span class=nx>ppid</span><span class=si>}</span><span class=sb>`</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=k>throw</span> <span class=k>new</span> <span class=nb>Error</span><span class=p>(</span><span class=s1>&#39;worker process exception!&#39;</span><span class=p>);</span> <span class=c1>// 测试异常进程退出、重建
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>let</span> <span class=nx>worker</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=nx>process</span><span class=p>.</span><span class=nx>title</span> <span class=o>=</span> <span class=s1>&#39;worker-node&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=nx>process</span><span class=p>.</span><span class=nx>on</span><span class=p>(</span><span class=s1>&#39;message&#39;</span><span class=p>,</span> <span class=p>(</span><span class=nx>message</span><span class=p>,</span> <span class=nx>sendHandle</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=nx>message</span> <span class=o>===</span> <span class=s1>&#39;server&#39;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>worker</span> <span class=o>=</span> <span class=nx>sendHandle</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nx>worker</span><span class=p>.</span><span class=nx>on</span><span class=p>(</span><span class=s1>&#39;connection&#39;</span><span class=p>,</span> <span class=p>(</span><span class=nx>socket</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>server</span><span class=p>.</span><span class=nx>emit</span><span class=p>(</span><span class=s1>&#39;connection&#39;</span><span class=p>,</span> <span class=nx>socket</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>process</span><span class=p>.</span><span class=nx>on</span><span class=p>(</span><span class=s1>&#39;uncaughtException&#39;</span><span class=p>,</span> <span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>err</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nx>process</span><span class=p>.</span><span class=nx>send</span><span class=p>({</span> <span class=nx>act</span><span class=o>:</span> <span class=s1>&#39;suicide&#39;</span> <span class=p>});</span>
+</span></span><span class=line><span class=cl>  <span class=nx>worker</span><span class=p>.</span><span class=nx>close</span><span class=p>(()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>process</span><span class=p>.</span><span class=nx>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=p>});</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=执行结果>执行结果</h4><p>创建了 5 个进程, 一个 master 和 4 个 worker</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-verilog data-lang=verilog><span class=line><span class=cl><span class=n>worker</span> <span class=n>process</span> <span class=n>created</span><span class=p>,</span> <span class=nl>pid:</span> <span class=mh>57612</span> <span class=nl>ppid:</span> <span class=mh>57611</span>
+</span></span><span class=line><span class=cl><span class=n>worker</span> <span class=n>process</span> <span class=n>created</span><span class=p>,</span> <span class=nl>pid:</span> <span class=mh>57613</span> <span class=nl>ppid:</span> <span class=mh>57611</span>
+</span></span><span class=line><span class=cl><span class=n>worker</span> <span class=n>process</span> <span class=n>created</span><span class=p>,</span> <span class=nl>pid:</span> <span class=mh>57614</span> <span class=nl>ppid:</span> <span class=mh>57611</span>
+</span></span><span class=line><span class=cl><span class=n>worker</span> <span class=n>process</span> <span class=n>created</span><span class=p>,</span> <span class=nl>pid:</span> <span class=mh>57615</span> <span class=nl>ppid:</span> <span class=mh>57611</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=这里有-2-个问题>这里有 2 个问题</h4><h5 id=问题一-多个进程都需要监听同一个端口-怎么实现的>问题一: 多个进程都需要监听同一个端口, 怎么实现的?</h5><p>只有主进程监听了端口, 其他进程只是开启了 HTTP 服务, 没有监听端口, 这完全是可以的</p><h5 id=问题二-master-进程怎么将用户请求传递给-worker-进程>问题二: master 进程怎么将用户请求传递给 worker 进程?</h5><p>当 master 进程接收到用户请求后会接受到一个<code>connection</code>事件, 这时候 master 进程会触发 worker 的<code>connection</code>事件,</p><p>推荐阅读:</p><ul><li><a href=https://cnodejs.org/topic/56e84480833b7c8a0492e20c target=_blank rel="noopener noreffer">源码解析 Node.js 中 cluster 模块的主要功能实现</a></li></ul><h3 id=守护进程>守护进程</h3><p>守护进程运行在后台不受终端的影响. 守护的意思是说可以守护 web 服务进程不被中断, 如果被中断会再启动一个进程替代</p><ul><li>创建子进程</li><li>在子进程中创建新会话（调用系统函数 setsid）</li><li>改变子进程工作目录（如：“/” 或 “/usr/ 等）</li><li>父进程终止</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// index.js
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=p>{</span> <span class=nx>spawn</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;child_process&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>startDaemon</span> <span class=o>=</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kr>const</span> <span class=nx>daemon</span> <span class=o>=</span> <span class=nx>spawn</span><span class=p>(</span><span class=s1>&#39;node&#39;</span><span class=p>,</span> <span class=p>[</span><span class=s1>&#39;./daemon.js&#39;</span><span class=p>],</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>cwd</span><span class=o>:</span> <span class=s1>&#39;./&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>detached</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>stdio</span><span class=o>:</span> <span class=s1>&#39;ignore&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=p>});</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;守护进程开启 父进程 pid: %s, 守护进程 pid: %s&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>process</span><span class=p>.</span><span class=nx>pid</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>daemon</span><span class=p>.</span><span class=nx>pid</span>
+</span></span><span class=line><span class=cl>  <span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nx>daemon</span><span class=p>.</span><span class=nx>unref</span><span class=p>();</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>startDaemon</span><span class=p>();</span>
+</span></span></code></pre></td></tr></table></div></div><p>开启一个子进程, 每 10 秒写入一条日志</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// daemon.js
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=nx>fs</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;fs&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=p>{</span> <span class=nx>Console</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;console&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// custom simple logger
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=nx>logger</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Console</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>  <span class=nx>fs</span><span class=p>.</span><span class=nx>createWriteStream</span><span class=p>(</span><span class=s1>&#39;./stdout.log&#39;</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>  <span class=nx>fs</span><span class=p>.</span><span class=nx>createWriteStream</span><span class=p>(</span><span class=s1>&#39;./stderr.log&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>setInterval</span><span class=p>(()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>logger</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;daemon pid: &#39;</span><span class=p>,</span> <span class=nx>process</span><span class=p>.</span><span class=nx>pid</span><span class=p>,</span> <span class=s1>&#39;, ppid: &#39;</span><span class=p>,</span> <span class=nx>process</span><span class=p>.</span><span class=nx>ppid</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>},</span> <span class=mi>1000</span> <span class=o>*</span> <span class=mi>10</span><span class=p>);</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=测试结果>测试结果:</h4><ol><li>主进程执行完会退出</li><li>子进程还在执行, 每 10 秒写入一条日志</li></ol></div></div></div></main><footer class=footer><div class=footer-container><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://hosea3000.github.io/ target=_blank>Hosea</a></span><span class=icp-splitter>&nbsp;|&nbsp;</span><br class=icp-br><span class=icp><a href=https://beian.miit.gov.cn/#/Integrated/index target=_blank>湘ICP备2021009721号</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
+</a><a href=# id=view-comments class=fixed-button title="View Comments"><i class="fas fa-comment fa-fw" aria-hidden=true></i></a></div><link rel=stylesheet href=/lib/katex/katex.min.css><link rel=stylesheet href=/lib/cookieconsent/cookieconsent.min.css><script type=text/javascript src=/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/lib/lunr/lunr.min.js></script><script type=text/javascript src=/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/lib/twemoji/twemoji.min.js></script><script type=text/javascript src=/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/lib/katex/katex.min.js></script><script type=text/javascript src=/lib/katex/contrib/auto-render.min.js></script><script type=text/javascript src=/lib/katex/contrib/copy-tex.min.js></script><script type=text/javascript src=/lib/katex/contrib/mhchem.min.js></script><script type=text/javascript src=/lib/cookieconsent/cookieconsent.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:50},comment:{},cookieconsent:{content:{dismiss:"Got it!",link:"Learn more",message:"This website uses Cookies to improve your experience."},enable:!0,palette:{button:{background:"#f0f0f0"},popup:{background:"#1aa3ff"}},theme:"edgeless"},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{highlightTag:"em",lunrIndexURL:"/index.json",maxResultLength:10,noResultsFound:"No results found",snippetLength:50,type:"lunr"},twemoji:!0}</script><script type=text/javascript src=/js/theme.min.js></script></body></html>

@@ -1,0 +1,243 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>NodeJS 自定义流的实现 - Hosea 的个人笔记</title><meta name=Description content="hosea的学习笔记"><meta property="og:title" content="NodeJS 自定义流的实现"><meta property="og:description" content="NodeJS 自定义流的实现 概述 常见的自定义流有四种，Readable（可读流）、Writable（可写流）、Duplex（双工流）和 Transform"><meta property="og:type" content="article"><meta property="og:url" content="https://hosea3000.github.io/nodejs/stream/"><meta property="og:image" content="https://hosea3000.github.io/logo.png"><meta property="article:section" content="nodejs"><meta property="article:published_time" content="2022-10-21T02:02:33+08:00"><meta property="article:modified_time" content="2022-10-21T02:26:21+08:00"><meta property="og:site_name" content="hosea的学习笔记"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://hosea3000.github.io/logo.png"><meta name=twitter:title content="NodeJS 自定义流的实现"><meta name=twitter:description content="NodeJS 自定义流的实现 概述 常见的自定义流有四种，Readable（可读流）、Writable（可写流）、Duplex（双工流）和 Transform"><meta name=application-name content="hosea的个人笔记"><meta name=apple-mobile-web-app-title content="hosea的个人笔记"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hosea3000.github.io/nodejs/stream/><link rel=prev href=https://hosea3000.github.io/nodejs/npm/><link rel=next href=https://hosea3000.github.io/nodejs/common/><link rel=stylesheet href=/css/style.min.css><link rel=preload href=/lib/fontawesome-free/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/lib/animate/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"NodeJS 自定义流的实现","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hosea3000.github.io\/nodejs\/stream\/"},"genre":"nodejs","wordcount":1187,"url":"https:\/\/hosea3000.github.io\/nodejs\/stream\/","datePublished":"2022-10-21T02:02:33+08:00","dateModified":"2022-10-21T02:26:21+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"Hosea"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title="Hosea 的个人笔记">hosea</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/categories/ title=所有分类>分类 </a><a class=menu-item href=/posts/>文章 </a><a class=menu-item href=/nodejs/>Node.js </a><a class=menu-item href=/golang/ title=Golang>Golang </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder="Search titles or contents..." id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span>
+</span><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme"><i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title="Hosea 的个人笔记">hosea</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder="Search titles or contents..." id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/categories/ title=所有分类>分类</a><a class=menu-item href=/posts/ title>文章</a><a class=menu-item href=/nodejs/ title>Node.js</a><a class=menu-item href=/golang/ title=Golang>Golang</a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class="page single special"><h1 class="single-title animate__animated animate__pulse animate__faster">NodeJS 自定义流的实现</h1><div class=content id=content><h2 id=nodejs-自定义流的实现>NodeJS 自定义流的实现</h2><h3 id=概述>概述</h3><p>常见的自定义流有四种，Readable（可读流）、Writable（可写流）、Duplex（双工流）和 Transform（转换流），常见的自定义流应用有 HTTP 请求、响应，crypto 加密，进程 stdin 通信等等。</p><h3 id=自定义可读流>自定义可读流</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// 创建自定义可读流
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=p>{</span> <span class=nx>Readable</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;stream&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 创建自定义可读流的类
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>class</span> <span class=nx>MyRead</span> <span class=kr>extends</span> <span class=nx>Readable</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>constructor</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kr>super</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=p>.</span><span class=nx>index</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=c1>// 重写自定义的可读流的 _read 方法
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=c1>// 注意这个方法会调用多次
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=nx>_read</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=p>.</span><span class=nx>index</span><span class=o>++</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=p>.</span><span class=nx>push</span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=nx>index</span> <span class=o>+</span> <span class=s1>&#39;&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=nx>index</span> <span class=o>===</span> <span class=mi>3</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>this</span><span class=p>.</span><span class=nx>push</span><span class=p>(</span><span class=kc>null</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 验证自定义可读流
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>let</span> <span class=nx>myRead</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>MyRead</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>myRead</span><span class=p>.</span><span class=nx>on</span><span class=p>(</span><span class=s1>&#39;data&#39;</span><span class=p>,</span> <span class=p>(</span><span class=nx>data</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>data</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>myRead</span><span class=p>.</span><span class=nx>on</span><span class=p>(</span><span class=s1>&#39;end&#39;</span><span class=p>,</span> <span class=kd>function</span> <span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;读取完成&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// &lt;Buffer 31&gt;
+</span></span></span><span class=line><span class=cl><span class=c1>// &lt;Buffer 32&gt;
+</span></span></span><span class=line><span class=cl><span class=c1>// &lt;Buffer 33&gt;
+</span></span></span><span class=line><span class=cl><span class=c1>// 读取完成
+</span></span></span></code></pre></td></tr></table></div></div><p>我们自己写的 <code>_read</code> 方法会先查找并执行，在读取时使用 push 方法将数据读取出来，直到 push 的值为 null 才会停止，否则会认为没有读取完成，会继续调用 <code>_read</code>。</p><h3 id=自定义可写流>自定义可写流</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// 创建自定义可写流
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=p>{</span> <span class=nx>Writable</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s2>&#34;stream&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 创建自定义可写流的类
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>class</span> <span class=nx>MyWrite</span> <span class=kr>extends</span> <span class=nx>Writable</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 重写自定义的可写流的 _write 方法
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>_write</span><span class=p>(</span><span class=nx>chunk</span><span class=p>,</span> <span class=nx>encoding</span><span class=p>,</span> <span class=nx>callback</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>callback</span><span class=p>();</span> <span class=c1>// 将缓存区写入文件
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 验证自定义可写流
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>let</span> <span class=nx>myWrite</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>MyWrite</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>myWrite</span><span class=p>.</span><span class=nx>write</span><span class=p>(</span><span class=s2>&#34;hello&#34;</span><span class=p>,</span> <span class=s2>&#34;utf8&#34;</span><span class=p>,</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s2>&#34;hello ok&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>myWrite</span><span class=p>.</span><span class=nx>write</span><span class=p>(</span><span class=s2>&#34;world&#34;</span><span class=p>,</span> <span class=s2>&#34;utf8&#34;</span><span class=p>,</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s2>&#34;world ok&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// hello ok
+</span></span></span><span class=line><span class=cl><span class=c1>// world ok
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=自定义双工流-duplex>自定义双工流 Duplex</h3><p>双工流分别具备 Readable 和 Writable 的功能，但是读和写互不影响，互不关联。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// 创建自定双工流
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=p>{</span> <span class=nx>Duplex</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s2>&#34;stream&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 创建自定义双工流的类
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>class</span> <span class=nx>MyDuplex</span> <span class=kr>extends</span> <span class=nx>Duplex</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 重写自定义的双工流的 _read 方法
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>_read</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>this</span><span class=p>.</span><span class=nx>push</span><span class=p>(</span><span class=s2>&#34;123&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>this</span><span class=p>.</span><span class=nx>push</span><span class=p>(</span><span class=kc>null</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 重写自定义的双工流的 _write 方法
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>_write</span><span class=p>(</span><span class=nx>chunk</span><span class=p>,</span> <span class=nx>encoding</span><span class=p>,</span> <span class=nx>callback</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>callback</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 验证自定义双工流
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>let</span> <span class=nx>myDuplex</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>MyDuplex</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>myDuplex</span><span class=p>.</span><span class=nx>on</span><span class=p>(</span><span class=s2>&#34;readable&#34;</span><span class=p>,</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>myDuplex</span><span class=p>.</span><span class=nx>read</span><span class=p>(</span><span class=mi>1</span><span class=p>),</span> <span class=s2>&#34;----&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>setTimeout</span><span class=p>(()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>myDuplex</span><span class=p>.</span><span class=nx>on</span><span class=p>(</span><span class=s2>&#34;data&#34;</span><span class=p>,</span> <span class=nx>data</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>data</span><span class=p>,</span> <span class=s2>&#34;xxxx&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span><span class=line><span class=cl><span class=p>},</span> <span class=mi>3000</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// &lt;Buffer 31&gt; ----
+</span></span></span><span class=line><span class=cl><span class=c1>// &lt;Buffer 32&gt; xxxx
+</span></span></span><span class=line><span class=cl><span class=c1>// &lt;Buffer 32&gt; ----
+</span></span></span><span class=line><span class=cl><span class=c1>// &lt;Buffer 33&gt; xxxx
+</span></span></span></code></pre></td></tr></table></div></div><p>如果 readable 和 data 两种读取方式都使用默认先通过 data 事件读取，所以一般只选择一个，不要同时使用，可读流的特点是读取数据被消耗掉后就丢失了（缓存区被清空），如果非要两个都用可以加一个定时器（绝对不要这样写）。</p><h3 id=自定义转化流-transform>自定义转化流 Transform</h3><p>转化流的意思是即可以当作可读流，又可以当作可写流，创建一个类名为 MyTransform，并继承 stream 中的 Transform 类，重写 _transform 方法，该方法的参数和 _write 相同。</p><p>在自定义转化流的 _transform 方法中，读取数据的 push 方法和 写入数据的 callback 都可以使用。</p><p>由此可以看出，Transform 类型可以将可读流转化为可写流，也可以将可写流转化成可读流，他的主要目的不是像其他类型的流一样负责数据的读写，而是既作为可读流又作为可写流，实现流的转化，即实现对数据的特殊处理，如 zib 模块实现的压缩流，cropo 模块实现的加密流，本质都是转化流，将转化流作为可写流，将存储文件内容的可写流通过 pipe 方法写入转化流，再将转化流作为可读流通过 pipe 方法将处理后的数据响应给浏览器。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=c1>// 创建自定义转化流
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=p>{</span> <span class=nx>Transform</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;stream&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 创建自定义转化流的类
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>class</span> <span class=nx>MyTransform</span> <span class=kr>extends</span> <span class=nx>Transform</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 重写自定义的转化流的 _transform 方法
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>_transform</span><span class=p>(</span><span class=nx>chunk</span><span class=p>,</span> <span class=nx>encoding</span><span class=p>,</span> <span class=nx>callback</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>chunck</span><span class=p>.</span><span class=nx>toString</span><span class=p>.</span><span class=nx>toUpperCase</span><span class=p>());</span>
+</span></span><span class=line><span class=cl>        <span class=nx>callback</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>        <span class=k>this</span><span class=p>.</span><span class=nx>push</span><span class=p>(</span><span class=s1>&#39;123&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 验证自定义转化流
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>let</span> <span class=nx>myTransForm</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>MyTransform</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 使用标准输入
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>process</span><span class=p>.</span><span class=nx>stdin</span><span class=p>.</span><span class=nx>pipe</span><span class=p>(</span><span class=nx>myTransForm</span><span class=p>).</span><span class=nx>pipe</span><span class=p>(</span><span class=nx>process</span><span class=p>.</span><span class=nx>stdin</span><span class=p>);</span>
+</span></span></code></pre></td></tr></table></div></div></div></div></div></main><footer class=footer><div class=footer-container><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://hosea3000.github.io/ target=_blank>Hosea</a></span><span class=icp-splitter>&nbsp;|&nbsp;</span><br class=icp-br><span class=icp><a href=https://beian.miit.gov.cn/#/Integrated/index target=_blank>湘ICP备2021009721号</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
+</a><a href=# id=view-comments class=fixed-button title="View Comments"><i class="fas fa-comment fa-fw" aria-hidden=true></i></a></div><link rel=stylesheet href=/lib/katex/katex.min.css><link rel=stylesheet href=/lib/cookieconsent/cookieconsent.min.css><script type=text/javascript src=/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/lib/lunr/lunr.min.js></script><script type=text/javascript src=/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/lib/twemoji/twemoji.min.js></script><script type=text/javascript src=/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/lib/katex/katex.min.js></script><script type=text/javascript src=/lib/katex/contrib/auto-render.min.js></script><script type=text/javascript src=/lib/katex/contrib/copy-tex.min.js></script><script type=text/javascript src=/lib/katex/contrib/mhchem.min.js></script><script type=text/javascript src=/lib/cookieconsent/cookieconsent.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:50},comment:{},cookieconsent:{content:{dismiss:"Got it!",link:"Learn more",message:"This website uses Cookies to improve your experience."},enable:!0,palette:{button:{background:"#f0f0f0"},popup:{background:"#1aa3ff"}},theme:"edgeless"},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{highlightTag:"em",lunrIndexURL:"/index.json",maxResultLength:10,noResultsFound:"No results found",snippetLength:50,type:"lunr"},twemoji:!0}</script><script type=text/javascript src=/js/theme.min.js></script></body></html>
