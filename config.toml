@@ -39,7 +39,15 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
 # 菜单配置
 [menu]
 [[menu.main]]
-    weight = 2
+    weight = 10
+    identifier = "categories"
+    pre = ""
+    post = ""
+    name = "分类"
+    url = "categories/"
+    title = "所有分类"
+[[menu.main]]
+    weight = 20
     identifier = "posts"
     # 你可以在名称 (允许 HTML 格式) 之前添加其他信息, 例如图标
     pre = ""
@@ -50,21 +58,21 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
     # 当你将鼠标悬停在此菜单链接上时, 将显示的标题
     title = ""
 [[menu.main]]
-    weight = 3
-    identifier = "tags"
+    weight = 40
+    identifier = "Node.js"
     pre = ""
     post = ""
-    name = "标签"
-    url = "tags/"
-title = ""
-[[menu.main]]
-    weight = 4
-    identifier = "categories"
-    pre = ""
-    post = ""
-    name = "分类"
-    url = "categories/"
+    name = "Node.js"
+    url = "nodejs/"
     title = ""
+[[menu.main]]
+    weight = 50
+    identifier = "golang"
+    pre = ""
+    post = ""
+    name = "Golang"
+    url = "golang/"
+    title = "Golang"
 
 [params]
     # 网站默认主题样式 ["auto", "light", "dark"]
